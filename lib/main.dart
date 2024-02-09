@@ -14,8 +14,8 @@ void main()  {
   });
 }
 
-Color sage = const Color.fromRGBO(115, 134, 120, 1);
-Color dark = const Color.fromRGBO(77,93,83, 94);
+Color sage = Color.fromARGB(255, 24, 187, 119);
+Color dark = Color.fromARGB(255, 98, 148, 255);
 //first is degrees, next is radians
 final List<bool> selectedAngle = <bool>[true, false];
 
@@ -73,9 +73,11 @@ class _HomePageState extends State<HomePage> {
           'Motor Adjustment App',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 40,
+            fontSize: 50,
+            fontWeight: FontWeight.w800
           ),
         ),
+        toolbarHeight: 80,
         backgroundColor: dark,
       ),
       body: Container(
@@ -83,7 +85,7 @@ class _HomePageState extends State<HomePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [sage, sage]
+            colors: [dark, sage]
             ),
         ),
         child:  Center(
@@ -103,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                 selectedBorderColor: dark,
                 selectedColor: Colors.white,
                 fillColor: sage.withGreen(175),
-                color: Colors.red,
+                color: Colors.black,
                 constraints: const BoxConstraints(
                   minHeight: 40.0,
                   minWidth: 80.0,
