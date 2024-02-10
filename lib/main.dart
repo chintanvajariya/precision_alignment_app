@@ -1,23 +1,27 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:adjustment_app/calculation.dart';
 
 void main()  {
   runApp(const MyApp());
 
   doWhenWindowReady(() {
-    const initialSize = Size(1110, 650);
-    const minSize = Size(1100, 500);
+    const initialSize = Size(1200, 750);
+    const minSize = Size(1100, 650);
     appWindow.minSize = minSize;
     appWindow.size = initialSize; //default size
     appWindow.show();
   });
 }
 
-Color sage = Color.fromARGB(255, 24, 187, 119);
+Color sage = Color.fromARGB(255, 26, 195, 150);
 Color dark = Color.fromARGB(255, 98, 148, 255);
 //first is degrees, next is radians
 final List<bool> selectedAngle = <bool>[true, false];
+
+String left = "Values will be displayed here.";
+String right = "";
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -47,26 +51,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Widget> angles = <Widget>[
-    const Text('Degrees'),
-    const Text('Radians')
+    const Text('Radians'),
+    const Text('Degrees')
   ];
 
 
-  TextEditingController inputControllerXRot = TextEditingController();
-  TextEditingController inputControllerYRot = TextEditingController();
-  TextEditingController inputControllerZRot = TextEditingController();
+  TextEditingController rot = TextEditingController();
+  TextEditingController theta = TextEditingController();
+  TextEditingController phi = TextEditingController();
 
+  TextEditingController fRot = TextEditingController();
+  TextEditingController fTheta = TextEditingController();
+  TextEditingController fPhi = TextEditingController();
 
-  TextEditingController inputControllerXDist = TextEditingController();
-  TextEditingController inputControllerYDist = TextEditingController();
-  TextEditingController inputControllerZDist = TextEditingController();
-
-
+  TextEditingController xDist = TextEditingController();
+  TextEditingController yDist = TextEditingController();
+  TextEditingController zDist = TextEditingController();
   
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -78,20 +82,21 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         toolbarHeight: 80,
-        backgroundColor: dark,
+        backgroundColor: sage,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [dark, sage]
+            colors: [dark, dark, sage, sage]
             ),
         ),
         child:  Center(
           child: Column(
             children: [
-              SizedBox(width: screenWidth, height: 20),
+              SizedBox(width: screenWidth),
+              const Spacer(),
               ToggleButtons(
                 onPressed: (int index) {
                   setState(() {
@@ -101,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                     }
                   });
                 },
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
                 selectedBorderColor: dark,
                 selectedColor: Colors.white,
                 fillColor: sage.withGreen(175),
@@ -113,11 +118,13 @@ class _HomePageState extends State<HomePage> {
                 isSelected: selectedAngle,
                 children: angles,
               ),
-              const SizedBox(height: 20),
+
+              const Spacer(),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
+                SizedBox(
                     width: screenWidth/3.5,
                     child: CupertinoTextFormFieldRow(
                       decoration: const BoxDecoration(
@@ -125,9 +132,9 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(6))
                         ),
                       padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
-                      controller: inputControllerXRot,
+                      controller: rot,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
-                      placeholder: 'x-Axis Rotation',
+                      placeholder: 'Initial Rotation (z)',
                       cursorColor: Colors.white,
                     ),
                   ),
@@ -140,9 +147,9 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(6))
                         ),
                       padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
-                      controller: inputControllerYRot,
+                      controller: theta,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
-                      placeholder: 'y-Axis Rotation',
+                      placeholder: 'Initial Theta (x)',
                       cursorColor: Colors.white,
                     ),
                   ),
@@ -155,9 +162,9 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(6))
                         ),
                       padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
-                      controller: inputControllerZRot,
+                      controller: phi,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
-                      placeholder: 'z-Axis Rotation',
+                      placeholder: 'Initial Phi (y)',
                       cursorColor: Colors.white,
                     ),
                   ),
@@ -165,7 +172,7 @@ class _HomePageState extends State<HomePage> {
               ),
 
 
-              SizedBox(width: screenWidth, height: 30),
+              const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -177,7 +184,59 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(6))
                         ),
                       padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
-                      controller: inputControllerXDist,
+                      controller: fRot,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
+                      placeholder: 'Final Rotation (z)',
+                      cursorColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: screenWidth/30),
+                  SizedBox(
+                    width: screenWidth/3.5,
+                    child: CupertinoTextFormFieldRow(
+                      decoration: const BoxDecoration(
+                        color: Color.fromRGBO(1, 1, 1, 0.075),
+                        borderRadius: BorderRadius.all(Radius.circular(6))
+                        ),
+                      padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
+                      controller: fTheta,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
+                      placeholder: 'Final Theta (x)',
+                      cursorColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: screenWidth/30),
+                  SizedBox(
+                    width: screenWidth/3.5,
+                    child: CupertinoTextFormFieldRow(
+                      decoration: const BoxDecoration(
+                        color: Color.fromRGBO(1, 1, 1, 0.075),
+                        borderRadius: BorderRadius.all(Radius.circular(6))
+                        ),
+                      padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
+                      controller: fPhi,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
+                      placeholder: 'Final Phi (y)',
+                      cursorColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+
+              const Spacer(),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth/3.5,
+                    child: CupertinoTextFormFieldRow(
+                      decoration: const BoxDecoration(
+                        color: Color.fromRGBO(1, 1, 1, 0.075),
+                        borderRadius: BorderRadius.all(Radius.circular(6))
+                        ),
+                      padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
+                      controller: xDist,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
                       placeholder: 'x-Axis Dist. from Origin (mm)',
                       cursorColor: Colors.white,
@@ -192,7 +251,7 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(6))
                         ),
                       padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
-                      controller: inputControllerYDist,
+                      controller: yDist,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
                       placeholder: 'y-Axis Dist. from Origin (mm)',
                       cursorColor: Colors.white,
@@ -207,7 +266,7 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(6))
                         ),
                       padding: const EdgeInsets.only(right: 7, top: 7, bottom: 7,),
-                      controller: inputControllerZDist,
+                      controller: zDist,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 22),
                       placeholder: 'z-Axis Dist. from Origin (mm)',
                       cursorColor: Colors.white,
@@ -215,6 +274,57 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+
+              const Spacer(),
+
+              FilledButton(
+                child: const Text(
+                  'Calculate',
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w300),
+                ),
+                onPressed: () {
+                  if(rot.text != "" && phi.text != "" && theta.text != "" &&
+                     xDist.text != "" && yDist.text != "" && zDist.text != "" &&
+                     fRot.text != "" && fPhi.text != "" && fTheta.text != "") {
+                      setState(() {
+                        left = calculate(rot, phi, theta, 
+                                            xDist, yDist, zDist,
+                                            fRot, fPhi, fTheta, selectedAngle[0])[0];
+                        right = calculate(rot, phi, theta, 
+                                            xDist, yDist, zDist,
+                                            fRot, fPhi, fTheta, selectedAngle[0])[1];
+                      });
+                    }
+                  }
+              ),
+
+              const Spacer(),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    left,
+                    style: TextStyle(
+                      fontSize: left == "Values will be displayed here." ? 50 : 16,
+                      color: left == "Values will be displayed here." ? dark : Colors.white,
+                    ),
+                  ),
+
+                  left == "Values will be displayed here." ? const SizedBox(width: 0) : const SizedBox(width: 100),
+                  
+                  left != "Values will be displayed here." ? Text(
+                    right,
+                    style: TextStyle(
+                      fontSize: left == "Values will be displayed here." ? 50 : 16,
+                      color: left == "Values will be displayed here." ? dark : Colors.white,
+                    ),
+                  ) : const SizedBox(height: 0),
+
+                ],
+              ),
+
+              const Spacer(),
             ],
           )
         ),
