@@ -19,7 +19,7 @@ String calculation(double r, double p, double t, double dx, double dy, double dz
   result += '\nX adjustment: ${-1 / math.sqrt(2) * (Offset.x - Offset.z)} mm\n'
       'Y adjustment: ${1 / math.sqrt(2) * (Offset.x + Offset.z)} mm\n'
       'Z adjustment: ${-Offset.y} mm';
-
+  
   return result;
 }
 
