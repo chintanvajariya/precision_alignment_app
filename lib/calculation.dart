@@ -1,25 +1,42 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-String calculation(double r, double p, double t, double dx, double dy, double dz) {
-  
-  // Calculate
-  vm.Matrix3 Rs = rot(r, p, t);
-  vm.Matrix3 Rf = rot(0, 0, 0); // Final desired orientation
+List<List<double>> rot(double r, double p, double t) {
+  List<List<double>> rr = [
+    [cos(r), -sin(r), 0],
+    [sin(r), cos(r), 0],
+    [0, 0, 1]
+  ];
+  List<List<double>> rt = [
+    [1, 0, 0],
+    [0, cos(t), -sin(t)],
+    [0, sin(t), cos(t)]
+  ];
+  List<List<double>> rp = [
+    [cos(p), 0, sin(p)],
+    [0, 1, 0],
+    [-sin(p), 0, cos(p)]
+  ];
+  return matrixMultiply(matrixMultiply(rp, rt), rr);
+}
 
-  List<double> output = motorAngles(Rf, Rs);
+List<double> motorAngles(List<List<double>> rf, List<List<double>> rs) {
+  var rm = matrixMultiply(rf, matrixInverse(rs));
+  var theta = -asin(rm[1][2]);
+  var phi = asin(rm[0][2] / cos(theta));
+  var rotation = asin(rm[1][0] / cos(theta));
+  return [rotation, phi, theta];
+}
 
-  String result = 'R1 setting: ${output[1] * 180 / math.pi} degrees\n'
-      'Azimuthal setting: ${-output[0] / (2 * math.pi)} rotations\n'
-      'Tilt setting: ${output[2] / (2 * math.pi)} rotations\n';
-
-  vm.Vector3 D = vm.Vector3(dx, dy, dz);
-  vm.Vector3 Offset = rot(output[0], output[1], output[2]).transform(D);
-
-  result += '\nX adjustment: ${-1 / math.sqrt(2) * (Offset.x - Offset.z)} mm\n'
-      'Y adjustment: ${1 / math.sqrt(2) * (Offset.x + Offset.z)} mm\n'
-      'Z adjustment: ${-Offset.y} mm';
-
+List<List<double>> matrixMultiply(List<List<double>> a, List<List<double>> b) {
+  var result = List.generate(a.length, (i) => List.filled(b[0].length, 0.0), growable: false);
+  for (var i = 0; i < a.length; i++) {
+    for (var j = 0; j < b[0].length; j++) {
+      for (var k = 0; k < a[0].length; k++) {
+        result[i][j] += a[i][k] * b[k][j];
+      }
+    }
+  }
   return result;
 }
 
