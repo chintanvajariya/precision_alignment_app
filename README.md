@@ -8,5 +8,7 @@ There are dozens of places in our 2e- ARPES system that could be misaligned. We 
 
 <img width="500" alt="image" src="https://github.com/chintanvajariya/adjustment_app/assets/49341214/91ecb079-e353-42b8-a546-4b46ffd82044">
 
+<img width="500" alt="image" src="https://github.com/chintanvajariya/adjustment_app/assets/49341214/70bddd0a-93e6-4616-adcc-8388adb31ffb">
+
 ## Read More About 2e- ARPES Setup
 https://www.sciencedirect.com/science/article/pii/S0368204823001342
